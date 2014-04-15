@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include <cstdlib>
+#include <stdlib.h>
 #include <Windows.h>
 
 HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -62,159 +63,165 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	bool exit = false;
 	bool needUpdate = true;
+	int cooldown = 0;
+
+	srand(1);
 
 	do
 	{
-		if (GetKeyState(VK_LEFT) < 0) // Left Arrow is pressed
+		if (cooldown == 0)
 		{
-			for (int x = 1; x < 4; x++)
-			{
-				for (int y = 0; y < 4; y++)
-				{
-					int val = tableau[x][y];
-					if (val != 0)
-					{
-						for (int i = 1; i <= x; i++)
-						{
-							int other = tableau[x - i][y];
-							if (other != 0)
-							{
-								if (val == other)
-								{
-									tableau[x][y] = 0;
-									tableau[x - i][y] = val * 2;
-									needUpdate = true;
-								}
-								else if (i > 1)
-								{
-									tableau[x][y] = 0;
-									tableau[x - i + 1][y] = val;
-									needUpdate = true;
-								}
-								break;
-							}
-							else if (x - i == 0)
-							{
-								tableau[x][y] = 0;
-								tableau[0][y] = val;
-								needUpdate = true;
-							}
-						}
-					}
-				}
-			}
-		}
-		if (GetKeyState(VK_RIGHT) < 0) // Right Arrow is pressed
-		{
-			for (int x = 3; x >= 0; x--)
-			{
-				for (int y = 0; y < 4; y++)
-				{
-					int val = tableau[x][y];
-					if (val != 0)
-					{
-						for (int i = 1; i <= 4 - x; i++)
-						{
-							int other = tableau[x + i][y];
-							if (other != 0)
-							{
-								if (val == other)
-								{
-									tableau[x][y] = 0;
-									tableau[x + i][y] = val * 2;
-									needUpdate = true;
-								}
-								else if (i > 1)
-								{
-									tableau[x][y] = 0;
-									tableau[x + i - 1][y] = val;
-									needUpdate = true;
-								}
-								break;
-							}
-							else if (x + i == 3)
-							{
-								tableau[x][y] = 0;
-								tableau[3][y] = val;
-								needUpdate = true;
-							}
-						}
-					}
-				}
-			}
-		}
-		if (GetKeyState(VK_UP) < 0) // Up Arrow is pressed
-		{
-			for (int y = 0; y < 4; y++)
+			if (GetKeyState(VK_LEFT) < 0) // Left Arrow is pressed
 			{
 				for (int x = 1; x < 4; x++)
 				{
-					int val = tableau[x][y];
-					if (val != 0)
+					for (int y = 0; y < 4; y++)
 					{
-						for (int i = 1; i <= y; i++)
+						int val = tableau[x][y];
+						if (val != 0)
 						{
-							int other = tableau[x][y - i];
-							if (other != 0)
+							for (int i = 1; i <= x; i++)
 							{
-								if (val == other)
+								int other = tableau[x - i][y];
+								if (other != 0)
+								{
+									if (val == other)
+									{
+										tableau[x][y] = 0;
+										tableau[x - i][y] = val * 2;
+										needUpdate = true;
+									}
+									else if (i > 1)
+									{
+										tableau[x][y] = 0;
+										tableau[x - i + 1][y] = val;
+										needUpdate = true;
+									}
+									break;
+								}
+								else if (x - i == 0)
 								{
 									tableau[x][y] = 0;
-									tableau[x][y - i] = val * 2;
+									tableau[0][y] = val;
 									needUpdate = true;
 								}
-								else if (i > 1)
-								{
-									tableau[x][y] = 0;
-									tableau[x][y - i + 1] = val;
-									needUpdate = true;
-								}
-								break;
-							}
-							else if (y - i == 0)
-							{
-								tableau[x][y] = 0;
-								tableau[x][0] = val;
-								needUpdate = true;
 							}
 						}
 					}
 				}
 			}
-		}
-		if (GetKeyState(VK_DOWN) < 0) // Down Arrow is pressed
-		{
-			for (int y = 3; y >= 0; y--)
+			if (GetKeyState(VK_RIGHT) < 0) // Right Arrow is pressed
 			{
-				for (int x = 1; x < 4; x++)
+				for (int x = 2; x >= 0; x--)
 				{
-					int val = tableau[x][y];
-					if (val != 0)
+					for (int y = 0; y < 4; y++)
 					{
-						for (int i = 1; i <= 4 - y; i++)
+						int val = tableau[x][y];
+						if (val != 0)
 						{
-							int other = tableau[x][y + i];
-							if (other != 0)
+							for (int i = 1; i <= 4 - x; i++)
 							{
-								if (val == other)
+								int other = tableau[x + i][y];
+								if (other != 0)
+								{
+									if (val == other)
+									{
+										tableau[x][y] = 0;
+										tableau[x + i][y] = val * 2;
+										needUpdate = true;
+									}
+									else if (i > 1)
+									{
+										tableau[x][y] = 0;
+										tableau[x + i - 1][y] = val;
+										needUpdate = true;
+									}
+									break;
+								}
+								else if (x + i == 3)
 								{
 									tableau[x][y] = 0;
-									tableau[x][y + i] = val * 2;
+									tableau[3][y] = val;
 									needUpdate = true;
 								}
-								else if (i > 1)
-								{
-									tableau[x][y] = 0;
-									tableau[x][y + i - 1] = val;
-									needUpdate = true;
-								}
-								break;
 							}
-							else if (y + i == 3)
+						}
+					}
+				}
+			}
+			if (GetKeyState(VK_UP) < 0) // Up Arrow is pressed
+			{
+				for (int y = 1; y < 4; y++)
+				{
+					for (int x = 0; x < 4; x++)
+					{
+						int val = tableau[x][y];
+						if (val != 0)
+						{
+							for (int i = 1; i <= y; i++)
 							{
-								tableau[x][y] = 0;
-								tableau[x][3] = val;
-								needUpdate = true;
+								int other = tableau[x][y - i];
+								if (other != 0)
+								{
+									if (val == other)
+									{
+										tableau[x][y] = 0;
+										tableau[x][y - i] = val * 2;
+										needUpdate = true;
+									}
+									else if (i > 1)
+									{
+										tableau[x][y] = 0;
+										tableau[x][y - i + 1] = val;
+										needUpdate = true;
+									}
+									break;
+								}
+								else if (y - i == 0)
+								{
+									tableau[x][y] = 0;
+									tableau[x][0] = val;
+									needUpdate = true;
+								}
+							}
+						}
+					}
+				}
+			}
+			if (GetKeyState(VK_DOWN) < 0) // Down Arrow is pressed
+			{
+				for (int y = 2; y >= 0; y--)
+				{
+					for (int x = 0; x < 4; x++)
+					{
+						int val = tableau[x][y];
+						if (val != 0)
+						{
+							for (int i = 1; i <= 4 - y; i++)
+							{
+								int other = tableau[x][y + i];
+								if (other != 0)
+								{
+									if (val == other)
+									{
+										tableau[x][y] = 0;
+										tableau[x][y + i] = val * 2;
+										needUpdate = true;
+									}
+									else if (i > 1)
+									{
+										tableau[x][y] = 0;
+										tableau[x][y + i - 1] = val;
+										needUpdate = true;
+									}
+									break;
+								}
+								else if (y + i == 3)
+								{
+									tableau[x][y] = 0;
+									tableau[x][3] = val;
+									needUpdate = true;
+								}
 							}
 						}
 					}
@@ -222,14 +229,38 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 		}
 
-		if (needUpdate)
+		if (needUpdate) // Quelque chose à bouger
 		{
+			//Tab plein ?
+
+
+			//Randomize :
+			int val = 0;
+			int r = rand() % 100;
+			if (r < 80)
+				val = 2;
+			else
+				val = 4;
+			while (true)
+			{
+				int r = rand() % 16;
+				if (tableau[r % 4][r / 4] == 0)
+				{
+					tableau[r % 4][r / 4] = val;
+					break;
+				}
+			}
+
 			system("cls");
 			display(tableau);
+			cooldown = 500;
 			needUpdate = false;
 		}
 
 		Sleep(50);
+		cooldown -= 50;
+		if (cooldown < 0)
+			cooldown = 0;
 
 	} while (!exit);
 
