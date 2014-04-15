@@ -253,7 +253,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 			system("cls");
 			display(tableau);
-			cooldown = 500;
+			cooldown = 250;
 			needUpdate = false;
 		}
 
