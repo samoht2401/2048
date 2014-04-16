@@ -10,7 +10,13 @@ HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 COORD CursorPosition;
 
 // Gère l'affichage
-void display(int tab[][4])
+void displayMenu()
+{
+	printf("==========Menu==========\n");
+	printf("1. Play\n2. Scores\n3. Quit\n");
+};
+
+void displayGame(int tab[][4])
 {
 	for (int y = 0; y < 4; y++)
 	{
@@ -54,6 +60,28 @@ void display(int tab[][4])
 	printf("_____________________\n");
 };
 
+void getNewNumber(int tab[][4])
+{
+	//Randomize :
+	int val = 0;
+	int r = rand() % 100;
+	if (r < 80)
+		val = 2;
+	else
+		val = 4;
+	for (int i = 500; i > 0; i--)
+	{
+		int r = rand() % 16;
+		if (tab[r % 4][r / 4] == 0)
+		{
+			tab[r % 4][r / 4] = val;
+			break;
+		}
+	}
+}
+
+bool isInMenu = true;
+
 int _tmain(int argc, _TCHAR* argv[])
 {
 	int tableau[4][4] = { { 0, 0, 0, 0 }, // pour [X,Y] : X vertical, Y horizontale
@@ -69,230 +97,251 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	do
 	{
-		if (cooldown == 0)
+		// Code du menu
+		if (isInMenu)
 		{
-			if (GetKeyState(VK_LEFT) < 0) // Left Arrow is pressed
+			if (GetKeyState(0x31) < 0 || GetKeyState(VK_NUMPAD1) < 0) // 1.Play
 			{
-				for (int x = 1; x < 4; x++)
+				isInMenu = false;
+				needUpdate = true;
+				for (int x = 0; x < 4; x++)
+					for (int y = 0; y < 4; y++)
+						tableau[x][y] = 0;
+				getNewNumber(tableau);
+			}
+			if (GetKeyState(0x32) < 0 || GetKeyState(VK_NUMPAD2) < 0) // 2.Scores
+			{
+
+			}
+			if (GetKeyState(0x33) < 0 || GetKeyState(VK_NUMPAD3) < 0) // 3.Quit
+			{
+				exit = true;
+			}
+		}
+		// Code du jeu
+		else
+		{
+			if (cooldown == 0)
+			{
+				if (GetKeyState(VK_LEFT) < 0) // Left Arrow is pressed
+				{
+					for (int x = 1; x < 4; x++)
+					{
+						for (int y = 0; y < 4; y++)
+						{
+							int val = tableau[x][y];
+							if (val != 0)
+							{
+								for (int i = 1; i <= x; i++)
+								{
+									int other = tableau[x - i][y];
+									if (other != 0)
+									{
+										if (val == other)
+										{
+											tableau[x][y] = 0;
+											tableau[x - i][y] = val * 2;
+											needUpdate = true;
+										}
+										else if (i > 1)
+										{
+											tableau[x][y] = 0;
+											tableau[x - i + 1][y] = val;
+											needUpdate = true;
+										}
+										break;
+									}
+									else if (x - i == 0)
+									{
+										tableau[x][y] = 0;
+										tableau[0][y] = val;
+										needUpdate = true;
+									}
+								}
+							}
+						}
+					}
+				}
+				if (GetKeyState(VK_RIGHT) < 0) // Right Arrow is pressed
+				{
+					for (int x = 2; x >= 0; x--)
+					{
+						for (int y = 0; y < 4; y++)
+						{
+							int val = tableau[x][y];
+							if (val != 0)
+							{
+								for (int i = 1; i <= 4 - x; i++)
+								{
+									int other = tableau[x + i][y];
+									if (other != 0)
+									{
+										if (val == other)
+										{
+											tableau[x][y] = 0;
+											tableau[x + i][y] = val * 2;
+											needUpdate = true;
+										}
+										else if (i > 1)
+										{
+											tableau[x][y] = 0;
+											tableau[x + i - 1][y] = val;
+											needUpdate = true;
+										}
+										break;
+									}
+									else if (x + i == 3)
+									{
+										tableau[x][y] = 0;
+										tableau[3][y] = val;
+										needUpdate = true;
+									}
+								}
+							}
+						}
+					}
+				}
+				if (GetKeyState(VK_UP) < 0) // Up Arrow is pressed
+				{
+					for (int y = 1; y < 4; y++)
+					{
+						for (int x = 0; x < 4; x++)
+						{
+							int val = tableau[x][y];
+							if (val != 0)
+							{
+								for (int i = 1; i <= y; i++)
+								{
+									int other = tableau[x][y - i];
+									if (other != 0)
+									{
+										if (val == other)
+										{
+											tableau[x][y] = 0;
+											tableau[x][y - i] = val * 2;
+											needUpdate = true;
+										}
+										else if (i > 1)
+										{
+											tableau[x][y] = 0;
+											tableau[x][y - i + 1] = val;
+											needUpdate = true;
+										}
+										break;
+									}
+									else if (y - i == 0)
+									{
+										tableau[x][y] = 0;
+										tableau[x][0] = val;
+										needUpdate = true;
+									}
+								}
+							}
+						}
+					}
+				}
+				if (GetKeyState(VK_DOWN) < 0) // Down Arrow is pressed
+				{
+					for (int y = 2; y >= 0; y--)
+					{
+						for (int x = 0; x < 4; x++)
+						{
+							int val = tableau[x][y];
+							if (val != 0)
+							{
+								for (int i = 1; i <= 4 - y; i++)
+								{
+									int other = tableau[x][y + i];
+									if (other != 0)
+									{
+										if (val == other)
+										{
+											tableau[x][y] = 0;
+											tableau[x][y + i] = val * 2;
+											needUpdate = true;
+										}
+										else if (i > 1)
+										{
+											tableau[x][y] = 0;
+											tableau[x][y + i - 1] = val;
+											needUpdate = true;
+										}
+										break;
+									}
+									else if (y + i == 3)
+									{
+										tableau[x][y] = 0;
+										tableau[x][3] = val;
+										needUpdate = true;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if (needUpdate) // Quelque chose a bougé
+			{
+				getNewNumber(tableau);
+
+				//Tab plein ?
+				bool isThere0 = false;
+				for (int x = 0; x < 4; x++)
 				{
 					for (int y = 0; y < 4; y++)
 					{
-						int val = tableau[x][y];
-						if (val != 0)
+						if (tableau[x][y] == 0)
 						{
-							for (int i = 1; i <= x; i++)
-							{
-								int other = tableau[x - i][y];
-								if (other != 0)
-								{
-									if (val == other)
-									{
-										tableau[x][y] = 0;
-										tableau[x - i][y] = val * 2;
-										needUpdate = true;
-									}
-									else if (i > 1)
-									{
-										tableau[x][y] = 0;
-										tableau[x - i + 1][y] = val;
-										needUpdate = true;
-									}
-									break;
-								}
-								else if (x - i == 0)
-								{
-									tableau[x][y] = 0;
-									tableau[0][y] = val;
-									needUpdate = true;
-								}
-							}
+							isThere0 = true;
+							break;
 						}
 					}
+					if (isThere0)
+						break;
 				}
-			}
-			if (GetKeyState(VK_RIGHT) < 0) // Right Arrow is pressed
-			{
-				for (int x = 2; x >= 0; x--)
+				if (!isThere0)
 				{
-					for (int y = 0; y < 4; y++)
+					//Combine posible ?
+					bool canCombine = false;
+					for (int i = 0; i < 8; i++)
 					{
+						int pair = i / 2 % 2; // Pair == 0 // Impair == 1
+						int x = i % 2 + pair;
+						int y = i / 2 + pair;
+
 						int val = tableau[x][y];
-						if (val != 0)
+						if ((x>0 && val == tableau[x - 1][y]) || (x<3 && val == tableau[x + 1][y]) ||
+							(y>0 && val == tableau[x][y - 1]) || (y < 3 && val == tableau[x][y + 1]))
 						{
-							for (int i = 1; i <= 4 - x; i++)
-							{
-								int other = tableau[x + i][y];
-								if (other != 0)
-								{
-									if (val == other)
-									{
-										tableau[x][y] = 0;
-										tableau[x + i][y] = val * 2;
-										needUpdate = true;
-									}
-									else if (i > 1)
-									{
-										tableau[x][y] = 0;
-										tableau[x + i - 1][y] = val;
-										needUpdate = true;
-									}
-									break;
-								}
-								else if (x + i == 3)
-								{
-									tableau[x][y] = 0;
-									tableau[3][y] = val;
-									needUpdate = true;
-								}
-							}
+							canCombine = true;
+							break;
 						}
 					}
-				}
-			}
-			if (GetKeyState(VK_UP) < 0) // Up Arrow is pressed
-			{
-				for (int y = 1; y < 4; y++)
-				{
-					for (int x = 0; x < 4; x++)
+
+					if (!canCombine)
 					{
-						int val = tableau[x][y];
-						if (val != 0)
-						{
-							for (int i = 1; i <= y; i++)
-							{
-								int other = tableau[x][y - i];
-								if (other != 0)
-								{
-									if (val == other)
-									{
-										tableau[x][y] = 0;
-										tableau[x][y - i] = val * 2;
-										needUpdate = true;
-									}
-									else if (i > 1)
-									{
-										tableau[x][y] = 0;
-										tableau[x][y - i + 1] = val;
-										needUpdate = true;
-									}
-									break;
-								}
-								else if (y - i == 0)
-								{
-									tableau[x][y] = 0;
-									tableau[x][0] = val;
-									needUpdate = true;
-								}
-							}
-						}
+						isInMenu = true;
+						needUpdate = true;
 					}
-				}
-			}
-			if (GetKeyState(VK_DOWN) < 0) // Down Arrow is pressed
-			{
-				for (int y = 2; y >= 0; y--)
-				{
-					for (int x = 0; x < 4; x++)
-					{
-						int val = tableau[x][y];
-						if (val != 0)
-						{
-							for (int i = 1; i <= 4 - y; i++)
-							{
-								int other = tableau[x][y + i];
-								if (other != 0)
-								{
-									if (val == other)
-									{
-										tableau[x][y] = 0;
-										tableau[x][y + i] = val * 2;
-										needUpdate = true;
-									}
-									else if (i > 1)
-									{
-										tableau[x][y] = 0;
-										tableau[x][y + i - 1] = val;
-										needUpdate = true;
-									}
-									break;
-								}
-								else if (y + i == 3)
-								{
-									tableau[x][y] = 0;
-									tableau[x][3] = val;
-									needUpdate = true;
-								}
-							}
-						}
-					}
+					cooldown = 250;
 				}
 			}
 		}
 
-		if (needUpdate) // Quelque chose a bougé
+		if (needUpdate)
 		{
-			//Randomize :
-			int val = 0;
-			int r = rand() % 100;
-			if (r < 80)
-				val = 2;
-			else
-				val = 4;
-			for (int i = 500; i > 0; i--)
-			{
-				int r = rand() % 16;
-				if (tableau[r % 4][r / 4] == 0)
-				{
-					tableau[r % 4][r / 4] = val;
-					break;
-				}
-			}
-
-			//Tab plein ?
-			bool isThere0 = false;
-			for (int x = 0; x < 4; x++)
-			{
-				for (int y = 0; y < 4; y++)
-				{
-					if (tableau[x][y] == 0)
-					{
-						isThere0 = true;
-						break;
-					}
-				}
-				if (isThere0)
-					break;
-			}
-			if (!isThere0)
-			{
-				//Combine posible ?
-				bool canCombine = false;
-				for (int i = 0; i < 8; i++)
-				{
-					int pair = i / 2 % 2; // Pair == 0 // Impair == 1
-					int x = i % 2 + pair;
-					int y = i / 2 + pair;
-
-					int val = tableau[x][y];
-					if (val == tableau[x - 1][y] || val == tableau[x + 1][y] ||
-						val == tableau[x][y - 1] || val == tableau[x][y + 1])
-					{
-						canCombine = true;
-						break;
-					}
-				}
-
-				if (!canCombine)
-					exit = true;
-			}
-
 			system("cls");
-			display(tableau);
-			cooldown = 250;
+
+			if (isInMenu)
+				displayMenu();
+			else
+				displayGame(tableau);
+
 			needUpdate = false;
 		}
-
 		Sleep(50);
+
 		cooldown -= 50;
 		if (cooldown < 0)
 			cooldown = 0;
