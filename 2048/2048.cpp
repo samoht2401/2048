@@ -189,7 +189,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				}
 			}
 			if (GetKeyState(VK_DOWN) < 0) // Down Arrow is pressed
-			{
+			{ 
 				for (int y = 2; y >= 0; y--)
 				{
 					for (int x = 0; x < 4; x++)
@@ -229,11 +229,8 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 		}
 
-		if (needUpdate) // Quelque chose à bouger
+		if (needUpdate) // Quelque chose a bougé
 		{
-			//Tab plein ?
-
-
 			//Randomize :
 			int val = 0;
 			int r = rand() % 100;
@@ -241,7 +238,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				val = 2;
 			else
 				val = 4;
-			while (true)
+			for (int i = 500; i > 0; i--)
 			{
 				int r = rand() % 16;
 				if (tableau[r % 4][r / 4] == 0)
@@ -251,6 +248,26 @@ int _tmain(int argc, _TCHAR* argv[])
 				}
 			}
 
+			//Tab plein ?
+			bool isThere0 = false;
+			for (int x = 0; x < 4; x++)
+			{
+				for (int y = 0; y < 4; y++)
+				{
+					if (tableau[x][y] == 0)
+					{
+						isThere0 = true;
+						break;
+					}
+				}
+				if (isThere0)
+					break;
+			}
+			//Combine posible ?
+			for (int i = 0; i < 8; i++)
+			{
+				bool pair = i
+			}
 			system("cls");
 			display(tableau);
 			cooldown = 250;
