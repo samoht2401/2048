@@ -65,7 +65,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	bool needUpdate = true;
 	int cooldown = 0;
 
-	srand(1);
+	srand(2401);
 
 	do
 	{
@@ -189,7 +189,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				}
 			}
 			if (GetKeyState(VK_DOWN) < 0) // Down Arrow is pressed
-			{ 
+			{
 				for (int y = 2; y >= 0; y--)
 				{
 					for (int x = 0; x < 4; x++)
@@ -263,11 +263,29 @@ int _tmain(int argc, _TCHAR* argv[])
 				if (isThere0)
 					break;
 			}
-			//Combine posible ?
-			for (int i = 0; i < 8; i++)
+			if (!isThere0)
 			{
-				bool pair = i
+				//Combine posible ?
+				bool canCombine = false;
+				for (int i = 0; i < 8; i++)
+				{
+					int pair = i / 2 % 2; // Pair == 0 // Impair == 1
+					int x = i % 2 + pair;
+					int y = i / 2 + pair;
+
+					int val = tableau[x][y];
+					if (val == tableau[x - 1][y] || val == tableau[x + 1][y] ||
+						val == tableau[x][y - 1] || val == tableau[x][y + 1])
+					{
+						canCombine = true;
+						break;
+					}
+				}
+
+				if (!canCombine)
+					exit = true;
 			}
+
 			system("cls");
 			display(tableau);
 			cooldown = 250;
