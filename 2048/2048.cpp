@@ -16,13 +16,12 @@ void displayMenu()
 	printf("1. Play\n2. Scores\n3. Quit\n");
 };
 
-void displayGame(int tab[][4])
+void displayGame(int tab[][4], int score)
 {
+	printf("_____________________\n");
+	printf("|    |    |    |    |    Score : %d\n", score);
 	for (int y = 0; y < 4; y++)
 	{
-		printf("_____________________\n");
-		printf("|    |    |    |    |\n");
-
 		string s = "";
 		for (int x = 0; x < 4; x++)
 		{
@@ -56,8 +55,10 @@ void displayGame(int tab[][4])
 		printf(s.c_str());
 
 		printf("|    |    |    |    |\n");
+		printf("_____________________\n");
+		if (y != 3)
+			printf("|    |    |    |    |\n");
 	}
-	printf("_____________________\n");
 };
 
 void getNewNumber(int tab[][4])
@@ -81,6 +82,7 @@ void getNewNumber(int tab[][4])
 }
 
 bool isInMenu = true;
+bool isWin = false;
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -91,22 +93,41 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	bool exit = false;
 	bool needUpdate = true;
+	bool isLost = false;
 	int cooldown = 0;
+	int score = 0;
 
 	srand(2401);
 
 	do
 	{
+		if (GetKeyState(VK_ESCAPE) < 0)
+		{
+			isLost = false;
+			isWin = false;
+			isInMenu = true;
+			needUpdate = true;
+		}
+		if (isLost)
+		{
+			if (GetKeyState(VK_RETURN) < 0)
+			{
+				isLost = false;
+				isWin = false;
+				isInMenu = true;
+				needUpdate = true;
+			}
+		}
 		// Code du menu
-		if (isInMenu)
+		else if (isInMenu)
 		{
 			if (GetKeyState(0x31) < 0 || GetKeyState(VK_NUMPAD1) < 0) // 1.Play
 			{
 				isInMenu = false;
 				needUpdate = true;
 				for (int x = 0; x < 4; x++)
-					for (int y = 0; y < 4; y++)
-						tableau[x][y] = 0;
+				for (int y = 0; y < 4; y++)
+					tableau[x][y] = 0;
 				getNewNumber(tableau);
 			}
 			if (GetKeyState(0x32) < 0 || GetKeyState(VK_NUMPAD2) < 0) // 2.Scores
@@ -141,7 +162,15 @@ int _tmain(int argc, _TCHAR* argv[])
 										{
 											tableau[x][y] = 0;
 											tableau[x - i][y] = val * 2;
+											score += val * 2;
 											needUpdate = true;
+											if (val * 2 == 2048)
+											{
+												needUpdate = true;
+												isWin = true;
+
+											}
+
 										}
 										else if (i > 1)
 										{
@@ -180,7 +209,15 @@ int _tmain(int argc, _TCHAR* argv[])
 										{
 											tableau[x][y] = 0;
 											tableau[x + i][y] = val * 2;
+											score += val * 2;
 											needUpdate = true;
+											if (val * 2 == 2048)
+											{
+												needUpdate = true;
+												isWin = true;
+
+											}
+
 										}
 										else if (i > 1)
 										{
@@ -219,7 +256,15 @@ int _tmain(int argc, _TCHAR* argv[])
 										{
 											tableau[x][y] = 0;
 											tableau[x][y - i] = val * 2;
+											score += val * 2;
 											needUpdate = true;
+											if (val * 2 == 2048)
+											{
+												needUpdate = true;
+												isWin = true;
+
+											}
+
 										}
 										else if (i > 1)
 										{
@@ -258,7 +303,15 @@ int _tmain(int argc, _TCHAR* argv[])
 										{
 											tableau[x][y] = 0;
 											tableau[x][y + i] = val * 2;
+											score += val * 2;
 											needUpdate = true;
+											if (val * 2 == 2048)
+											{
+												needUpdate = true;
+												isWin = true;
+
+											}
+
 										}
 										else if (i > 1)
 										{
@@ -307,8 +360,8 @@ int _tmain(int argc, _TCHAR* argv[])
 					for (int i = 0; i < 8; i++)
 					{
 						int pair = i / 2 % 2; // Pair == 0 // Impair == 1
-						int x = i % 2 + pair;
-						int y = i / 2 + pair;
+						int x = (i % 2) * 2 + pair;
+						int y = i / 2;
 
 						int val = tableau[x][y];
 						if ((x>0 && val == tableau[x - 1][y]) || (x<3 && val == tableau[x + 1][y]) ||
@@ -320,10 +373,8 @@ int _tmain(int argc, _TCHAR* argv[])
 					}
 
 					if (!canCombine)
-					{
-						isInMenu = true;
-						needUpdate = true;
-					}
+						isLost = true;
+
 					cooldown = 250;
 				}
 			}
@@ -336,7 +387,13 @@ int _tmain(int argc, _TCHAR* argv[])
 			if (isInMenu)
 				displayMenu();
 			else
-				displayGame(tableau);
+				displayGame(tableau, score);
+
+			if (isLost)
+				printf("Vous avez perdu\n"); // Rajouter ici les scores de fin
+
+			if (isWin)
+				printf("Vous avez gagne");
 
 			needUpdate = false;
 		}
