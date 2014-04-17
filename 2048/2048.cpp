@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <Windows.h>
 
+
 HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 COORD CursorPosition;
 
@@ -14,6 +15,12 @@ void displayMenu()
 {
 	printf("==========Menu==========\n");
 	printf("1. Play\n2. Scores\n3. Quit\n");
+};
+
+void displayScore(int score)
+{
+	printf_s("==========Best Score==========\n");
+	printf_s("%d", score);
 };
 
 void displayGame(int tab[][4], int score)
@@ -81,6 +88,20 @@ void getNewNumber(int tab[][4])
 	}
 }
 
+int readScore()
+{
+	FILE* pfile;
+	fopen_s(&pfile, "scores.txt", "r");
+	if (pfile != NULL)
+	{
+		int savedVal;
+		fscanf_s(pfile, "%d", &savedVal);
+		fclose(pfile);
+		return savedVal;
+	}
+	return 0;
+}
+
 bool isInMenu = true;
 bool isWin = false;
 
@@ -94,6 +115,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	bool exit = false;
 	bool needUpdate = true;
 	bool isLost = false;
+	bool isInScore = false;
 	int cooldown = 0;
 	int score = 0;
 
@@ -106,6 +128,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			isLost = false;
 			isWin = false;
 			isInMenu = true;
+			isInScore = false;
 			needUpdate = true;
 		}
 		if (isLost)
@@ -132,7 +155,11 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 			if (GetKeyState(0x32) < 0 || GetKeyState(VK_NUMPAD2) < 0) // 2.Scores
 			{
-
+				isInMenu = false;
+				isInScore = true;
+				needUpdate = true;
+				score = readScore();
+				
 			}
 			if (GetKeyState(0x33) < 0 || GetKeyState(VK_NUMPAD3) < 0) // 3.Quit
 			{
@@ -386,12 +413,36 @@ int _tmain(int argc, _TCHAR* argv[])
 
 			if (isInMenu)
 				displayMenu();
+			else if (isInScore)
+				displayScore(score);
+
 			else
 				displayGame(tableau, score);
 
 			if (isLost)
-				printf("Vous avez perdu\n"); // Rajouter ici les scores de fin
+			{
+				printf("Vous avez perdu\n");// Rajouter ici les scores de fin
+				FILE* pfile;
+				fopen_s(&pfile,"scores.txt", "r");
+				if (pfile != NULL)
+				{
+					int savedVal;
+					fscanf_s(pfile, "%d", &savedVal);
+					fclose(pfile);
+					pfile = NULL;
 
+					if (score > savedVal)
+					{
+						fopen_s(&pfile, "scores.txt", "w");
+						
+						if (pfile != NULL)
+						{
+							fprintf_s(pfile, "%d", score);
+							fclose(pfile);
+						}
+					}
+				}
+			}
 			if (isWin)
 				printf("Vous avez gagne");
 
